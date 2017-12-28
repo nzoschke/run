@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -18,10 +19,38 @@ type PrefixWriter struct {
 
 func (pw *PrefixWriter) Write(p []byte) (n int, err error) {
 	n = len(p)
-	b := []byte("    ")
-	b = append(b, p...)
-	_, err = pw.w.Write(b)
-	return n, err
+
+	buf := bytes.NewBuffer(p)
+	for {
+		l, err := buf.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				if err := write(pw.w, l); err != nil {
+					return n, err
+				}
+				break
+			}
+			return n, err
+		}
+
+		if err := write(pw.w, l); err != nil {
+			return n, err
+		}
+	}
+
+	return n, nil
+}
+
+func write(w io.Writer, line []byte) error {
+	if line == nil {
+		return nil
+	}
+
+	pre := []byte("    ")
+	b := append(pre, line...)
+	b = append(b, []byte("\n")...)
+	_, err := w.Write(b)
+	return err
 }
 
 func main() {
