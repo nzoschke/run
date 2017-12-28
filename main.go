@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
+	"time"
 
 	shellquote "github.com/kballard/go-shellquote"
 )
@@ -25,13 +24,17 @@ func (pw *PrefixWriter) Write(p []byte) (n int, err error) {
 }
 
 func main() {
-	name := os.Args[1]
-	args := os.Args[2:]
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "usage: run cmd [args]\n")
+		os.Exit(1)
+	}
 
-	s := fmt.Sprintf("RUN: %s '%s'\n", name, strings.Join(args, "' '"))
-	os.Stderr.WriteString(s)
+	args := shellquote.Join(os.Args[1:]...)
+	now := time.Now()
 
-	sargs := []string{"-c", shellquote.Join(os.Args[1:]...)}
+	fmt.Fprintf(os.Stderr, "EXEC: %s\n\n", args)
+
+	sargs := []string{"-c", args}
 	cmd := exec.Command("bash", sargs...)
 	cmd.Env = os.Environ()
 	cmd.Stdin = os.Stdin
@@ -45,9 +48,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// cmd.Stderr = os.Stderr
-	// cmd.Stdout = os.Stdout
 
 	err = cmd.Start()
 	if err != nil {
@@ -74,7 +74,7 @@ func main() {
 			// in this situation, exit code could not be get, and stderr will be
 			// empty string very likely, so we use the default fail code, and format err
 			// to string and set to stderr
-			log.Printf("Could not get exit code for failed program: %v, %v", name, args)
+			fmt.Fprintf(os.Stderr, "Could not get exit code for failed program: %s", args)
 			code = 1
 		}
 	} else {
@@ -83,8 +83,8 @@ func main() {
 		code = ws.ExitStatus()
 	}
 
-	s = fmt.Sprintf("CODE: %d\n", code)
-	os.Stderr.WriteString(s)
+	fmt.Fprintf(os.Stderr, "\nEXIT: %d\n", code)
+	fmt.Fprintf(os.Stderr, "TIME: %f\n", time.Since(now).Seconds())
 
 	os.Exit(code)
 }
