@@ -13,6 +13,16 @@ import (
 	shellquote "github.com/kballard/go-shellquote"
 )
 
+type Devices struct {
+	Stderr io.ReadWriter
+	Stdout io.ReadWriter
+}
+
+var Dev = Devices{
+	Stderr: os.Stderr,
+	Stdout: os.Stdout,
+}
+
 type PrefixWriter struct {
 	w io.Writer
 }
@@ -71,10 +81,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *s != "" {
-		fmt.Fprintf(os.Stderr, "STAT: %s\n", *s)
+	code := run(args, *s)
+	os.Exit(code)
+}
+
+func run(args, stat string) int {
+	if stat != "" {
+		fmt.Fprintf(Dev.Stderr, "STAT: %s\n", stat)
 	}
-	fmt.Fprintf(os.Stderr, "EXEC: %q\n", args)
+	fmt.Fprintf(Dev.Stderr, "EXEC: %q\n", args)
 
 	now := time.Now()
 	sargs := []string{"-c", args}
@@ -98,11 +113,11 @@ func main() {
 	}
 
 	go func() {
-		io.Copy(&PrefixWriter{os.Stderr}, e)
+		io.Copy(&PrefixWriter{Dev.Stderr}, e)
 	}()
 
 	go func() {
-		io.Copy(&PrefixWriter{os.Stdout}, o)
+		io.Copy(&PrefixWriter{Dev.Stdout}, o)
 	}()
 
 	code := 0
@@ -117,7 +132,7 @@ func main() {
 			// in this situation, exit code could not be get, and stderr will be
 			// empty string very likely, so we use the default fail code, and format err
 			// to string and set to stderr
-			fmt.Fprintf(os.Stderr, "Could not get exit code for failed program: %s", args)
+			fmt.Fprintf(Dev.Stderr, "Could not get exit code for failed program: %s", args)
 			code = 1
 		}
 	} else {
@@ -128,12 +143,12 @@ func main() {
 
 	dur := time.Since(now)
 
-	fmt.Fprintf(os.Stderr, "EXIT: %d\n", code)
-	fmt.Fprintf(os.Stderr, "TIME: %0.1fs\n", dur.Seconds())
+	fmt.Fprintf(Dev.Stderr, "EXIT: %d\n", code)
+	fmt.Fprintf(Dev.Stderr, "TIME: %0.1fs\n", dur.Seconds())
 
-	if code != 0 && *s != "" {
-		fmt.Fprintf(os.Stderr, "STAT: %s failed\n", *s)
+	if code != 0 && stat != "" {
+		fmt.Fprintf(Dev.Stderr, "STAT: %s failed\n", stat)
 	}
 
-	os.Exit(code)
+	return code
 }
