@@ -25,50 +25,57 @@ func testRun(args, stat string) (string, string) {
 func TestEcho(t *testing.T) {
 	eb, ob := testRun(`echo hello`, "")
 	assert.Equal(t, `EXEC: "echo hello"
-EXIT: 0
-TIME: 0.0s
-`, eb)
-	assert.Equal(t, "    hello\n\n", ob)
 
-	eb, ob = testRun(`echo -n hello`, "")
-	assert.Equal(t, `EXEC: "echo -n hello"
 EXIT: 0
 TIME: 0.0s
 `, eb)
 	assert.Equal(t, "    hello\n", ob)
 
-	eb, ob = testRun(`echo "hello"`, "")
-	assert.Equal(t, `EXEC: "echo \"hello\""
+	eb, ob = testRun(`echo -n hello`, "")
+	assert.Equal(t, `EXEC: "echo -n hello"
+
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\n\n", ob)
+	assert.Equal(t, "    hello", ob)
+
+	eb, ob = testRun(`echo "hello"`, "")
+	assert.Equal(t, `EXEC: "echo \"hello\""
+
+EXIT: 0
+TIME: 0.0s
+`, eb)
+	assert.Equal(t, "    hello\n", ob)
 
 	eb, ob = testRun(`echo 'hello'`, "")
 	assert.Equal(t, `EXEC: "echo 'hello'"
+
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\n\n", ob)
+	assert.Equal(t, "    hello\n", ob)
 
 	eb, ob = testRun(`echo 'hello\n'`, "")
 	assert.Equal(t, `EXEC: "echo 'hello\\n'"
+
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\\n\n\n", ob)
+	assert.Equal(t, "    hello\\n\n", ob)
 
 	eb, ob = testRun(`echo -e 'hello\n'`, "")
 	assert.Equal(t, `EXEC: "echo -e 'hello\\n'"
+
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\n    \n\n", ob)
+	assert.Equal(t, "    hello\n    \n", ob)
 
 	eb, ob = testRun(`echo -e 'hello\nworld\n'`, "")
 	assert.Equal(t, `EXEC: "echo -e 'hello\\nworld\\n'"
+
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\n    world\n    \n\n", ob)
+	assert.Equal(t, "    hello\n    world\n    \n", ob)
 }

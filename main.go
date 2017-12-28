@@ -48,7 +48,6 @@ func (pw *PrefixWriter) Write(p []byte) (n int, err error) {
 		}
 	}
 
-	_, err = pw.w.Write([]byte("\n"))
 	return n, err
 }
 
@@ -143,7 +142,7 @@ func run(args, stat string) int {
 
 	dur := time.Since(now)
 
-	fmt.Fprintf(Dev.Stderr, "EXIT: %d\n", code)
+	fmt.Fprintf(Dev.Stderr, "\nEXIT: %d\n", code)
 	fmt.Fprintf(Dev.Stderr, "TIME: %0.1fs\n", dur.Seconds())
 
 	if code != 0 && stat != "" {
