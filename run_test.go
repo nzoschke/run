@@ -63,6 +63,12 @@ TIME: 0.0s
 EXIT: 0
 TIME: 0.0s
 `, eb)
-	assert.Equal(t, "    hello\n\n    \n\n", ob)
+	assert.Equal(t, "    hello\n    \n\n", ob)
 
+	eb, ob = testRun(`echo -e 'hello\nworld\n'`, "")
+	assert.Equal(t, `EXEC: "echo -e 'hello\\nworld\\n'"
+EXIT: 0
+TIME: 0.0s
+`, eb)
+	assert.Equal(t, "    hello\n    world\n    \n\n", ob)
 }

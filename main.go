@@ -48,7 +48,8 @@ func (pw *PrefixWriter) Write(p []byte) (n int, err error) {
 		}
 	}
 
-	return n, nil
+	_, err = pw.w.Write([]byte("\n"))
+	return n, err
 }
 
 func write(w io.Writer, line []byte) error {
@@ -58,7 +59,6 @@ func write(w io.Writer, line []byte) error {
 
 	pre := []byte("    ")
 	b := append(pre, line...)
-	b = append(b, []byte("\n")...)
 	_, err := w.Write(b)
 	return err
 }
