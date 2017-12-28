@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -24,16 +25,29 @@ func (pw *PrefixWriter) Write(p []byte) (n int, err error) {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "usage: run cmd [args]\n")
+	flag.Bool("help", false, "show usage")
+	s := flag.String("s", "", "Add status messages to stderr")
+
+	flag.Usage = func() {
+		fmt.Printf("usage: %s [options] cmd [args]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	args := shellquote.Join(flag.Args()...)
+
+	if args == "" {
+		flag.Usage()
 		os.Exit(1)
 	}
 
-	args := shellquote.Join(os.Args[1:]...)
+	if *s != "" {
+		fmt.Fprintf(os.Stderr, "STAT: %s\n", *s)
+	}
+	fmt.Fprintf(os.Stderr, "EXEC: %q\n", args)
+
 	now := time.Now()
-
-	fmt.Fprintf(os.Stderr, "EXEC: %s\n\n", args)
-
 	sargs := []string{"-c", args}
 	cmd := exec.Command("bash", sargs...)
 	cmd.Env = os.Environ()
@@ -83,8 +97,14 @@ func main() {
 		code = ws.ExitStatus()
 	}
 
-	fmt.Fprintf(os.Stderr, "\nEXIT: %d\n", code)
-	fmt.Fprintf(os.Stderr, "TIME: %f\n", time.Since(now).Seconds())
+	dur := time.Since(now)
+
+	fmt.Fprintf(os.Stderr, "EXIT: %d\n", code)
+	fmt.Fprintf(os.Stderr, "TIME: %0.1fs\n", dur.Seconds())
+
+	if code != 0 && *s != "" {
+		fmt.Fprintf(os.Stderr, "STAT: %s failed\n", *s)
+	}
 
 	os.Exit(code)
 }
