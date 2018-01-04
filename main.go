@@ -13,16 +13,19 @@ import (
 	shellquote "github.com/kballard/go-shellquote"
 )
 
+// Devices holds writers for stderr and stdout
 type Devices struct {
 	Stderr io.ReadWriter
 	Stdout io.ReadWriter
 }
 
+// Dev is devices for normal execution
 var Dev = Devices{
 	Stderr: os.Stderr,
 	Stdout: os.Stdout,
 }
 
+// PrefixWriter writes lines indented by 4 spaces
 type PrefixWriter struct {
 	w io.Writer
 }
