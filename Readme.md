@@ -1,6 +1,8 @@
 # run
 
-Run is a utility for running commands in test environments. It adds human and machine friendly execution info to stderr, while preserving stdin, stdout and exit codes for the command.
+`run` is a utility for running commands in test environments. It adds human and machine friendly execution info to stderr, while preserving stdin, stdout and exit codes for the command.
+
+The output is compatible with the [BIOS GitHub App](https://www.mixable.net/docs/bios/).
 
 ```console
 $ go install github.com/nzoschke/run
