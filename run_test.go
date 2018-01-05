@@ -79,3 +79,25 @@ TIME: 0.0s
 `, eb)
 	assert.Equal(t, "    hello\n    world\n    \n", ob)
 }
+
+func TestTrueFalse(t *testing.T) {
+	eb, ob := testRun(`true`, "Testing")
+	assert.Equal(t, `STAT: Testing
+EXEC: "true"
+
+EXIT: 0
+TIME: 0.0s
+`, eb)
+	assert.Equal(t, "", ob)
+
+	eb, ob = testRun(`false`, "Testing")
+	assert.Equal(t, `STAT: Testing
+EXEC: "false"
+
+EXIT: 1
+TIME: 0.0s
+FAIL: Testing
+`, eb)
+	assert.Equal(t, "", ob)
+
+}
