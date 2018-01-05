@@ -37,5 +37,5 @@ EXEC: "git clone https://github.com/nzoschke/run"
     fatal: destination path 'run' already exists and is not an empty directory.
 EXIT: 128
 TIME: 0.0s
-STAT: Cloning failed
+FAIL: Cloning
 ```
