@@ -149,7 +149,7 @@ func run(args, stat string) int {
 	fmt.Fprintf(Dev.Stderr, "TIME: %0.1fs\n", dur.Seconds())
 
 	if code != 0 && stat != "" {
-		fmt.Fprintf(Dev.Stderr, "STAT: %s failed\n", stat)
+		fmt.Fprintf(Dev.Stderr, "FAIL: %s\n", stat)
 	}
 
 	return code
