@@ -5,7 +5,7 @@
 The output is compatible with the [BIOS GitHub App](https://www.mixable.net/docs/bios/).
 
 ```console
-$ go install github.com/nzoschke/run
+$ go get github.com/nzoschke/run
 
 $ run -h
 usage: run [options] cmd [args]
